@@ -1,4 +1,9 @@
 import { NextRequest } from "next/server";
+import {
+  RESUME_ANALYSIS_SYSTEM_PROMPT,
+  buildAnalysisPrompt,
+  createStreamingRequest,
+} from "@/lib/ai";
 
 export interface AnalyzeRequest {
   resumeText: string;
@@ -48,9 +53,71 @@ export async function POST(request: NextRequest) {
           // Send initial status
           sendEvent("status", { message: "Starting analysis..." });
 
-          // TODO: Implement AI analysis in US-026/US-027
-          // For now, send a placeholder response
+          // Build the analysis prompt
+          const userPrompt = buildAnalysisPrompt(
+            body.resumeText,
+            body.targetRole,
+            body.company
+          );
+
+          sendEvent("status", { message: "Analyzing resume..." });
+
+          // Make streaming request to AI API
+          const aiResponse = await createStreamingRequest(
+            RESUME_ANALYSIS_SYSTEM_PROMPT,
+            userPrompt
+          );
+
+          if (!aiResponse.body) {
+            throw new Error("No response body from AI API");
+          }
+
+          // Read and forward the streaming response
+          const reader = aiResponse.body.getReader();
+          const decoder = new TextDecoder();
+          let fullContent = "";
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            const chunk = decoder.decode(value, { stream: true });
+            const lines = chunk.split("\n");
+
+            for (const line of lines) {
+              if (line.startsWith("data: ")) {
+                const data = line.slice(6);
+                if (data === "[DONE]") continue;
+
+                try {
+                  const parsed = JSON.parse(data);
+                  // Handle different event types from Anthropic API
+                  if (parsed.type === "content_block_delta") {
+                    const text = parsed.delta?.text || "";
+                    fullContent += text;
+                    sendEvent("chunk", { text });
+                  } else if (parsed.type === "message_stop") {
+                    // Message complete
+                  }
+                } catch {
+                  // Ignore parse errors for incomplete chunks
+                }
+              }
+            }
+          }
+
+          // Send the complete analysis
           sendEvent("status", { message: "Analysis complete" });
+
+          // Try to parse the full content as JSON
+          try {
+            const analysis = JSON.parse(fullContent);
+            sendEvent("result", analysis);
+          } catch {
+            // If JSON parsing fails, send as raw content
+            sendEvent("result", { rawContent: fullContent });
+          }
+
           sendEvent("complete", { success: true });
         } catch (error) {
           console.error("Analysis error:", error);
