@@ -133,12 +133,13 @@ const DropZone = forwardRef<HTMLDivElement, DropZoneProps>(
         }}
         transition={{ type: "spring", stiffness: 400, damping: 25 }}
         className={cn(
-          "relative flex flex-col items-center justify-center gap-4",
-          "w-full p-12 rounded-[var(--radius-card)]",
+          "relative flex flex-col items-center justify-center gap-3 sm:gap-4",
+          "w-full px-4 py-8 sm:px-8 sm:py-12 rounded-[var(--radius-card)]",
+          "min-h-[180px] sm:min-h-[240px]",
           "border-2 border-dashed border-border",
-          "bg-bg-card/50 hover:bg-bg-card",
+          "bg-bg-card/50 hover:bg-bg-card active:bg-bg-card",
           "transition-colors duration-200 ease-out",
-          "cursor-pointer",
+          "cursor-pointer touch-manipulation",
           isDragOver && "bg-accent/5 border-accent",
           disabled && "opacity-50 cursor-not-allowed pointer-events-none",
           className
@@ -162,7 +163,7 @@ const DropZone = forwardRef<HTMLDivElement, DropZoneProps>(
           }}
           transition={{ type: "spring", stiffness: 400, damping: 25 }}
           className={cn(
-            "flex items-center justify-center w-16 h-16 rounded-full",
+            "flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full",
             isDragOver ? "bg-accent/20" : "bg-bg-elevated"
           )}
         >
@@ -175,10 +176,10 @@ const DropZone = forwardRef<HTMLDivElement, DropZoneProps>(
         </motion.div>
 
         {/* Main Text */}
-        <div className="text-center">
+        <div className="text-center px-2">
           <p
             className={cn(
-              "font-medium transition-colors",
+              "font-medium transition-colors text-sm sm:text-base",
               isDragOver ? "text-accent" : "text-text-primary"
             )}
           >
@@ -186,7 +187,7 @@ const DropZone = forwardRef<HTMLDivElement, DropZoneProps>(
               ? "Drop your file here"
               : "Drop your resume here or click to browse"}
           </p>
-          <p className="text-text-secondary text-sm mt-1">
+          <p className="text-text-secondary text-xs sm:text-sm mt-1">
             PDF only &bull; Max 5MB
           </p>
         </div>
