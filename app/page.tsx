@@ -14,9 +14,11 @@ import { Badge } from "@/components/ui/Badge";
 import { useToast } from "@/components/ui/Toast";
 import { Tabs, TabList, Tab, TabPanel } from "@/components/ui/Tabs";
 import { DropZone } from "@/components/upload/DropZone";
+import { FilePreview } from "@/components/upload/FilePreview";
 
 export default function Home() {
   const [loading, setLoading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const { addToast } = useToast();
 
   const handleLoadingDemo = () => {
@@ -118,12 +120,22 @@ export default function Home() {
         </Card>
 
         {/* DropZone Demo */}
-        <div className="max-w-lg w-full">
-          <h3 className="text-text-secondary text-sm mb-3">Drop Zone</h3>
-          <DropZone
-            onFileSelect={(file) => addToast({ type: "success", message: `Selected: ${file.name}` })}
-            onValidationError={(error) => addToast({ type: "error", message: error })}
-          />
+        <div className="max-w-lg w-full space-y-3">
+          <h3 className="text-text-secondary text-sm">Drop Zone</h3>
+          {selectedFile ? (
+            <FilePreview
+              file={selectedFile}
+              onRemove={() => setSelectedFile(null)}
+            />
+          ) : (
+            <DropZone
+              onFileSelect={(file) => {
+                setSelectedFile(file);
+                addToast({ type: "success", message: `Selected: ${file.name}` });
+              }}
+              onValidationError={(error) => addToast({ type: "error", message: error })}
+            />
+          )}
         </div>
 
         {/* Tabs Demo */}
