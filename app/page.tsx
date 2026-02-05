@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { useToast } from "@/components/ui/Toast";
+import { Tabs, TabList, Tab, TabPanel } from "@/components/ui/Tabs";
 
 export default function Home() {
   const [loading, setLoading] = useState(false);
@@ -115,12 +116,32 @@ export default function Home() {
           </CardFooter>
         </Card>
 
-        {/* Glass Card Demo */}
-        <Card glass className="max-w-lg w-full">
+        {/* Tabs Demo */}
+        <Card className="max-w-lg w-full">
           <CardContent>
-            <p className="text-text-secondary text-sm">
-              This card has a glass-morphism effect with backdrop blur.
-            </p>
+            <h3 className="text-text-secondary text-sm mb-3">Tabs Component</h3>
+            <Tabs defaultValue="tab1">
+              <TabList>
+                <Tab value="tab1">Overview</Tab>
+                <Tab value="tab2">Details</Tab>
+                <Tab value="tab3">Settings</Tab>
+              </TabList>
+              <TabPanel value="tab1">
+                <p className="text-text-secondary text-sm">
+                  This is the overview tab content with animated transitions.
+                </p>
+              </TabPanel>
+              <TabPanel value="tab2">
+                <p className="text-text-secondary text-sm">
+                  Here are the details with smooth fade-in animation.
+                </p>
+              </TabPanel>
+              <TabPanel value="tab3">
+                <p className="text-text-secondary text-sm">
+                  Settings panel with the same animated indicator.
+                </p>
+              </TabPanel>
+            </Tabs>
           </CardContent>
         </Card>
       </main>
