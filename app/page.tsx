@@ -11,6 +11,7 @@ import { UploadProgress } from "@/components/upload/UploadProgress";
 import { TextPreview } from "@/components/upload/TextPreview";
 import { RoleSelector } from "@/components/upload/RoleSelector";
 import { CompanyInput } from "@/components/upload/CompanyInput";
+import { SamplePreview } from "@/components/landing/SamplePreview";
 
 export default function Home() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -282,6 +283,9 @@ export default function Home() {
             Your resume is processed securely and never stored
           </p>
         </motion.div>
+
+        {/* Sample Analysis Preview */}
+        <SamplePreview className="mt-8" />
       </main>
     </div>
   );
