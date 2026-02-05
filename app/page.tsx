@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
 import { Flame, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
@@ -12,13 +13,19 @@ import { TextPreview } from "@/components/upload/TextPreview";
 import { RoleSelector } from "@/components/upload/RoleSelector";
 import { CompanyInput } from "@/components/upload/CompanyInput";
 import { SamplePreview } from "@/components/landing/SamplePreview";
+import { AnalysisLoading, type AnalysisStep } from "@/components/analysis/AnalysisLoading";
+import { parseAnalysisStream } from "@/lib/parseStream";
+import type { AnalysisResponse } from "@/lib/types";
 
 export default function Home() {
+  const router = useRouter();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isParsing, setIsParsing] = useState(false);
   const [parsedText, setParsedText] = useState<string | null>(null);
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [company, setCompany] = useState("");
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisStep, setAnalysisStep] = useState<AnalysisStep>("reading");
   const { addToast } = useToast();
 
   const handleFileSelect = async (file: File) => {
@@ -62,9 +69,55 @@ export default function Home() {
     setParsedText(null);
   };
 
-  const handleAnalyze = () => {
+  const handleAnalyze = async () => {
     if (!parsedText || !selectedRole) return;
-    addToast({ type: "info", message: "Analysis coming soon!" });
+
+    setIsAnalyzing(true);
+    setAnalysisStep("reading");
+
+    try {
+      const response = await fetch("/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          resumeText: parsedText,
+          targetRole: selectedRole,
+          targetCompany: company || undefined,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Analysis failed");
+      }
+
+      // Update step to scoring after a moment
+      setAnalysisStep("scoring");
+
+      // Parse the streaming response
+      const analysisResult = await parseAnalysisStream(
+        response,
+        (step) => {
+          // Update step based on what data we're receiving
+          if (step === "sections") {
+            setAnalysisStep("generating");
+          }
+        }
+      );
+
+      if (analysisResult) {
+        // Store result and navigate to results page
+        sessionStorage.setItem("analysisResult", JSON.stringify(analysisResult));
+        router.push("/results");
+      } else {
+        throw new Error("No analysis data received");
+      }
+    } catch (error) {
+      addToast({
+        type: "error",
+        message: "Failed to analyze resume. Please try again.",
+      });
+      setIsAnalyzing(false);
+    }
   };
 
   const canAnalyze = parsedText && selectedRole;
@@ -102,6 +155,25 @@ export default function Home() {
       </div>
 
       <main className="relative flex min-h-screen flex-col items-center px-4 py-16 md:py-24">
+        <AnimatePresence mode="wait">
+          {isAnalyzing ? (
+            <motion.div
+              key="analyzing"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="w-full max-w-xl mx-auto"
+            >
+              <AnalysisLoading currentStep={analysisStep} />
+            </motion.div>
+          ) : (
+            <motion.div
+              key="upload"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="w-full"
+            >
         {/* Hero Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -286,6 +358,9 @@ export default function Home() {
 
         {/* Sample Analysis Preview */}
         <SamplePreview className="mt-8" />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </main>
     </div>
   );

@@ -3,6 +3,8 @@
  * Extracts data progressively as it becomes available
  */
 
+import type { AnalysisResponse } from "./types";
+
 export interface PartialAnalysis {
   overallScore?: number;
   verdict?: string;
@@ -206,5 +208,3 @@ export async function parseAnalysisStream(
     reader.releaseLock();
   }
 }
-
-import type { AnalysisResponse } from "./types";
