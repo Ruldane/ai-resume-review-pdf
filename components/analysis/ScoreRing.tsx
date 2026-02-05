@@ -18,6 +18,12 @@ function getScoreColor(score: number): string {
   return "var(--success)";
 }
 
+function getScoreLabel(score: number): string {
+  if (score <= 40) return "Needs significant improvement";
+  if (score <= 70) return "Decent, but could be better";
+  return "Great job";
+}
+
 const ScoreRing = forwardRef<HTMLDivElement, ScoreRingProps>(
   ({ score, size = 160, strokeWidth = 12, className, animate = true }, ref) => {
     const [mounted, setMounted] = useState(false);
@@ -49,9 +55,16 @@ const ScoreRing = forwardRef<HTMLDivElement, ScoreRingProps>(
 
     const scoreColor = getScoreColor(score);
 
+    const scoreLabel = getScoreLabel(score);
+
     return (
       <div
         ref={ref}
+        role="meter"
+        aria-valuenow={score}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label={`Resume score: ${score} out of 100. ${scoreLabel}`}
         className={cn("relative inline-flex items-center justify-center", className)}
         style={{ width: size, height: size }}
       >
@@ -104,7 +117,8 @@ const ScoreRing = forwardRef<HTMLDivElement, ScoreRingProps>(
           >
             {displayScore}
           </motion.span>
-          <span className="text-sm text-text-secondary mt-1">/ 100</span>
+          <span className="text-sm text-text-secondary mt-1" aria-hidden="true">/ 100</span>
+          <span className="sr-only">{scoreLabel}</span>
         </div>
       </div>
     );
