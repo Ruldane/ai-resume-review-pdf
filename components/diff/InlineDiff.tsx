@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, useMemo, useState, useEffect, useRef } from "react";
+import { forwardRef, useMemo, useState, useEffect, useRef, memo } from "react";
 import { motion, useInView } from "framer-motion";
 import { computeDiff, type DiffSegment } from "@/lib/diff";
 import { cn } from "@/lib/cn";
@@ -115,4 +115,7 @@ const InlineDiff = forwardRef<HTMLDivElement, InlineDiffProps>(
 
 InlineDiff.displayName = "InlineDiff";
 
-export { InlineDiff };
+const MemoizedInlineDiff = memo(InlineDiff);
+MemoizedInlineDiff.displayName = "InlineDiff";
+
+export { MemoizedInlineDiff as InlineDiff };

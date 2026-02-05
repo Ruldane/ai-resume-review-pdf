@@ -1,0 +1,1223 @@
+{
+  "projectName": "AI Resume Roaster",
+  "branchName": "master",
+  "description": "A sleek, AI-powered resume analysis tool that roasts weak resumes and rewrites them for maximum impact",
+  "commitStrategy": "one-commit-per-task",
+  "testingTool": "mcp-browser",
+  "apiConfig": {
+    "baseUrl": "https://api.z.ai/api/anthropic",
+    "model": "glm-4.7"
+  },
+  "tasks": [
+    {
+      "id": "US-001",
+      "epic": "Project Setup & Infrastructure",
+      "title": "Configure Tailwind Design System",
+      "description": "Update tailwind.config.ts with custom color tokens, spacing scale, and border-radius tokens for the dark theme design system",
+      "acceptanceCriteria": [
+        "Update tailwind.config.ts with custom colors (bg-primary: #0A0A0B, bg-card: #141416, bg-elevated: #1C1C1F, accent: #6366F1, accent-hover: #818CF8, success: #22C55E, warning: #F59E0B, danger: #EF4444, text-primary: #F5F5F7, text-secondary: #A1A1AA, border: #27272A)",
+        "Configure custom spacing scale (4, 8, 12, 16, 24, 32, 48, 64)",
+        "Add border-radius tokens (8px cards, 12px modals, 24px pills/buttons)",
+        "Typecheck passes",
+        "Verify in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": []
+    },
+    {
+      "id": "US-002",
+      "epic": "Project Setup & Infrastructure",
+      "title": "Add Custom Fonts",
+      "description": "Configure Inter and JetBrains Mono fonts via next/font for typography consistency",
+      "acceptanceCriteria": [
+        "Configure Inter font (weights 400, 600, 700) via next/font",
+        "Configure JetBrains Mono font for code/scores via next/font",
+        "Update layout.tsx to apply font variables",
+        "Typecheck passes",
+        "Verify fonts render in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-001"]
+    },
+    {
+      "id": "US-003",
+      "epic": "Project Setup & Infrastructure",
+      "title": "Install Required Dependencies",
+      "description": "Install all project dependencies including pdf-parse, framer-motion, lucide-react, clsx, and tailwind-merge",
+      "acceptanceCriteria": [
+        "Install pdf-parse for PDF extraction",
+        "Install framer-motion for animations",
+        "Install lucide-react for icons",
+        "Install clsx and tailwind-merge for class utilities",
+        "All dependencies install without errors",
+        "Typecheck passes"
+      ],
+      "status": "completed",
+      "dependencies": []
+    },
+    {
+      "id": "US-004",
+      "epic": "Project Setup & Infrastructure",
+      "title": "Create Utility Functions",
+      "description": "Create cn.ts utility for class merging and types.ts with TypeScript interfaces",
+      "acceptanceCriteria": [
+        "Create /lib/cn.ts with clsx + tailwind-merge utility",
+        "Create /lib/types.ts with TypeScript interfaces for analysis response",
+        "Typecheck passes"
+      ],
+      "status": "completed",
+      "dependencies": ["US-003"]
+    },
+    {
+      "id": "US-005",
+      "epic": "Project Setup & Infrastructure",
+      "title": "Setup Environment Variables",
+      "description": "Create environment configuration for the Z AI API",
+      "acceptanceCriteria": [
+        "Create .env.local with ZAI_API_KEY placeholder",
+        "Add ZAI_BASE_URL=https://api.z.ai/api/anthropic",
+        "Add .env.local to .gitignore if not already present",
+        "Create .env.example with placeholder values"
+      ],
+      "status": "completed",
+      "dependencies": []
+    },
+    {
+      "id": "US-006",
+      "epic": "Project Setup & Infrastructure",
+      "title": "Create Button Component",
+      "description": "Create a reusable Button component with primary, secondary, and ghost variants",
+      "acceptanceCriteria": [
+        "Create /components/ui/Button.tsx with primary, secondary, and ghost variants",
+        "Support disabled state with appropriate styling",
+        "Support loading state with spinner",
+        "Include hover and focus states with proper transitions",
+        "Typecheck passes",
+        "Verify all button variants in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-001", "US-003", "US-004"]
+    },
+    {
+      "id": "US-007",
+      "epic": "Project Setup & Infrastructure",
+      "title": "Create Card Component",
+      "description": "Create a Card component for content containers with glass-morphism effect",
+      "acceptanceCriteria": [
+        "Create /components/ui/Card.tsx with glass-morphism effect",
+        "Support header, body, and footer sections",
+        "Use bg-card color with subtle border",
+        "Typecheck passes",
+        "Verify card styling in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-001", "US-004"]
+    },
+    {
+      "id": "US-008",
+      "epic": "Project Setup & Infrastructure",
+      "title": "Create Badge Component",
+      "description": "Create a Badge component for severity indicators with critical, warning, and good variants",
+      "acceptanceCriteria": [
+        "Create /components/ui/Badge.tsx with critical (red), warning (yellow), and good (green) variants",
+        "Support small and default sizes",
+        "Typecheck passes",
+        "Verify all badge variants in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-001", "US-004"]
+    },
+    {
+      "id": "US-009",
+      "epic": "Project Setup & Infrastructure",
+      "title": "Create Toast Component",
+      "description": "Create a Toast notification component for user feedback with auto-dismiss",
+      "acceptanceCriteria": [
+        "Create /components/ui/Toast.tsx for success/error/info notifications",
+        "Auto-dismiss after configurable duration",
+        "Support stacking multiple toasts",
+        "Include close button",
+        "Typecheck passes",
+        "Verify toast animations in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-001", "US-003", "US-004"]
+    },
+    {
+      "id": "US-010",
+      "epic": "Project Setup & Infrastructure",
+      "title": "Create Tabs Component",
+      "description": "Create a Tabs component with TabList, Tab, and TabPanel subcomponents",
+      "acceptanceCriteria": [
+        "Create /components/ui/Tabs.tsx with TabList, Tab, and TabPanel subcomponents",
+        "Support controlled and uncontrolled modes",
+        "Include animated active indicator",
+        "Typecheck passes",
+        "Verify tab switching in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-001", "US-003", "US-004"]
+    },
+    {
+      "id": "US-011",
+      "epic": "PDF Upload & Parsing",
+      "title": "Create Drop Zone UI - Basic Structure",
+      "description": "Create the basic DropZone component with upload area and text",
+      "acceptanceCriteria": [
+        "Create /components/upload/DropZone.tsx component",
+        "Render upload area with dashed border and upload icon",
+        "Display text 'Drop your resume here or click to browse'",
+        "Show 'PDF only - Max 5MB' subtext",
+        "Typecheck passes",
+        "Verify basic layout in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-001", "US-003", "US-004"]
+    },
+    {
+      "id": "US-012",
+      "epic": "PDF Upload & Parsing",
+      "title": "Add Drop Zone Drag Events",
+      "description": "Add drag-and-drop event handling with visual feedback",
+      "acceptanceCriteria": [
+        "Implement onDragOver, onDragEnter, onDragLeave, onDrop events",
+        "Add visual drag-over state (pulse border, scale(1.02))",
+        "Use Framer Motion for smooth transitions",
+        "Typecheck passes",
+        "Verify drag-over animation in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-011"]
+    },
+    {
+      "id": "US-013",
+      "epic": "PDF Upload & Parsing",
+      "title": "Add Click to Upload",
+      "description": "Add click-to-browse functionality with hidden file input",
+      "acceptanceCriteria": [
+        "Add hidden <input type='file' accept='.pdf'> element",
+        "Trigger file input on click of drop zone",
+        "Handle file selection from input change event",
+        "Typecheck passes",
+        "Verify click-to-upload works in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-011"]
+    },
+    {
+      "id": "US-014",
+      "epic": "PDF Upload & Parsing",
+      "title": "Add File Validation",
+      "description": "Add validation for file type and size with error messages",
+      "acceptanceCriteria": [
+        "Validate file type is PDF (reject non-PDF with error message)",
+        "Validate file size <= 5MB (reject with 'File too large' error)",
+        "Display error messages using Toast component",
+        "Typecheck passes",
+        "Verify error messages in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-009", "US-012", "US-013"]
+    },
+    {
+      "id": "US-015",
+      "epic": "PDF Upload & Parsing",
+      "title": "Create PDF Parse API Route",
+      "description": "Create API route to extract text from PDFs using pdf-parse",
+      "acceptanceCriteria": [
+        "Create /app/api/parse/route.ts POST endpoint",
+        "Accept FormData with file field",
+        "Use pdf-parse to extract text from PDF buffer",
+        "Return { success: true, text: string } on success",
+        "Typecheck passes"
+      ],
+      "status": "completed",
+      "dependencies": ["US-003"]
+    },
+    {
+      "id": "US-016",
+      "epic": "PDF Upload & Parsing",
+      "title": "Add PDF Parse Error Handling",
+      "description": "Add robust error handling for PDF parsing edge cases",
+      "acceptanceCriteria": [
+        "Handle corrupt PDF files with friendly error message",
+        "Detect scanned/image PDFs (empty text) and return 'Scanned PDF not supported' error",
+        "Handle files exceeding size limit",
+        "Return { success: false, error: string } on failure",
+        "Typecheck passes"
+      ],
+      "status": "completed",
+      "dependencies": ["US-015"]
+    },
+    {
+      "id": "US-017",
+      "epic": "PDF Upload & Parsing",
+      "title": "Create File Preview Component",
+      "description": "Create component to show uploaded file info with remove option",
+      "acceptanceCriteria": [
+        "Create /components/upload/FilePreview.tsx component",
+        "Display file name and size (formatted as KB/MB)",
+        "Show PDF icon",
+        "Include 'Remove' button to clear and re-upload",
+        "Typecheck passes",
+        "Verify file preview in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-006", "US-014"]
+    },
+    {
+      "id": "US-018",
+      "epic": "PDF Upload & Parsing",
+      "title": "Add Upload Progress Animation",
+      "description": "Add loading animation during PDF upload and parsing",
+      "acceptanceCriteria": [
+        "Show loading spinner during PDF upload and parsing",
+        "Display 'Parsing resume...' text during processing",
+        "Animate transition from loading to preview state",
+        "Typecheck passes",
+        "Verify loading animation in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-017"]
+    },
+    {
+      "id": "US-019",
+      "epic": "PDF Upload & Parsing",
+      "title": "Create Text Preview Panel",
+      "description": "Create scrollable panel to preview extracted resume text",
+      "acceptanceCriteria": [
+        "Create scrollable panel showing extracted resume text",
+        "Limit height with overflow scroll",
+        "Include 'Looks good' and 'Try another' action buttons",
+        "Typecheck passes",
+        "Verify text preview in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-006", "US-007", "US-018"]
+    },
+    {
+      "id": "US-020",
+      "epic": "PDF Upload & Parsing",
+      "title": "Add Section Detection Highlighting",
+      "description": "Detect and highlight common resume sections in preview",
+      "acceptanceCriteria": [
+        "Detect common sections (Summary, Experience, Education, Skills, Projects)",
+        "Highlight detected section headers in the preview",
+        "Display detected sections as chips/tags above preview",
+        "Typecheck passes",
+        "Verify section detection in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-008", "US-019"]
+    },
+    {
+      "id": "US-021",
+      "epic": "Role Selection & Configuration",
+      "title": "Create Role Selector Component",
+      "description": "Create component with preset role chips for target role selection",
+      "acceptanceCriteria": [
+        "Create /components/upload/RoleSelector.tsx component",
+        "Display preset role chips: 'Software Engineer', 'Product Manager', 'Data Scientist', 'ML Engineer', 'Designer', 'Marketing'",
+        "Style chips with active/inactive states using accent color",
+        "Typecheck passes",
+        "Verify role chips in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-001", "US-004"]
+    },
+    {
+      "id": "US-022",
+      "epic": "Role Selection & Configuration",
+      "title": "Add Custom Role Input",
+      "description": "Add custom role text input for roles not in presets",
+      "acceptanceCriteria": [
+        "Add 'Custom' chip that reveals text input when clicked",
+        "Show text input inline with proper styling",
+        "Allow typing custom role with clear/cancel option",
+        "Typecheck passes",
+        "Verify custom role input in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-021"]
+    },
+    {
+      "id": "US-023",
+      "epic": "Role Selection & Configuration",
+      "title": "Add Optional Company Field",
+      "description": "Add optional company name input field",
+      "acceptanceCriteria": [
+        "Add 'Target Company (optional)' text input below role selector",
+        "Style consistently with role selector",
+        "Include placeholder text 'e.g., Google, OpenAI'",
+        "Typecheck passes",
+        "Verify company field in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-022"]
+    },
+    {
+      "id": "US-024",
+      "epic": "Role Selection & Configuration",
+      "title": "Wire Up Form State",
+      "description": "Create state management for all form inputs and validation",
+      "acceptanceCriteria": [
+        "Create state management for: PDF text, selected role, company name",
+        "Validate all required fields (PDF and role) before enabling submit",
+        "Show disabled state with tooltip for incomplete fields",
+        "Typecheck passes",
+        "Verify form validation in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-006", "US-020", "US-023"]
+    },
+    {
+      "id": "US-025",
+      "epic": "AI Analysis Engine",
+      "title": "Create Analysis API Route Structure",
+      "description": "Create the API route structure for AI analysis with streaming headers",
+      "acceptanceCriteria": [
+        "Create /app/api/analyze/route.ts POST endpoint",
+        "Accept { resumeText: string, targetRole: string, company?: string } body",
+        "Set up response headers for streaming (Content-Type: text/event-stream)",
+        "Typecheck passes"
+      ],
+      "status": "completed",
+      "dependencies": ["US-004", "US-005"]
+    },
+    {
+      "id": "US-026",
+      "epic": "AI Analysis Engine",
+      "title": "Configure Z AI API Client",
+      "description": "Configure the Z AI API client with proper authentication and settings",
+      "acceptanceCriteria": [
+        "Create /lib/ai.ts with API client configuration",
+        "Set base URL to https://api.z.ai/api/anthropic/v1/messages",
+        "Configure authentication with Bearer token from env",
+        "Set model to glm-4.7",
+        "Set anthropic-version header to '2023-06-01'",
+        "Typecheck passes"
+      ],
+      "status": "completed",
+      "dependencies": ["US-005"]
+    },
+    {
+      "id": "US-027",
+      "epic": "AI Analysis Engine",
+      "title": "Create System Prompt",
+      "description": "Create the system prompt for AI resume analysis",
+      "acceptanceCriteria": [
+        "Create RESUME_ANALYSIS_SYSTEM_PROMPT constant in /lib/ai.ts",
+        "Include 'brutal but constructive resume reviewer' persona",
+        "Define JSON output schema requirements in prompt",
+        "Include section scoring guidelines (0-100, severity levels)",
+        "Include ATS keyword analysis instructions",
+        "Typecheck passes"
+      ],
+      "status": "completed",
+      "dependencies": ["US-026"]
+    },
+    {
+      "id": "US-028",
+      "epic": "AI Analysis Engine",
+      "title": "Create Analysis Prompt Builder",
+      "description": "Create function to build the analysis prompt with user inputs",
+      "acceptanceCriteria": [
+        "Create buildAnalysisPrompt(resumeText, targetRole, company?) function",
+        "Include resume text with clear delimiters",
+        "Include target role and company context",
+        "Request structured JSON output matching analysis schema",
+        "Typecheck passes"
+      ],
+      "status": "completed",
+      "dependencies": ["US-027"]
+    },
+    {
+      "id": "US-029",
+      "epic": "AI Analysis Engine",
+      "title": "Implement Streaming Response",
+      "description": "Implement streaming response from Z AI API to client",
+      "acceptanceCriteria": [
+        "Send request to Z AI API with stream: true",
+        "Create ReadableStream to forward chunks to client",
+        "Handle SSE format properly",
+        "Typecheck passes"
+      ],
+      "status": "completed",
+      "dependencies": ["US-025", "US-028"]
+    },
+    {
+      "id": "US-030",
+      "epic": "AI Analysis Engine",
+      "title": "Parse Streaming JSON Chunks",
+      "description": "Create incremental JSON parser for streaming responses",
+      "acceptanceCriteria": [
+        "Create /lib/parseStream.ts for incremental JSON parsing",
+        "Extract overall_score as soon as available",
+        "Extract sections progressively as they complete",
+        "Handle partial/incomplete JSON gracefully",
+        "Typecheck passes"
+      ],
+      "status": "completed",
+      "dependencies": ["US-004"]
+    },
+    {
+      "id": "US-031",
+      "epic": "AI Analysis Engine",
+      "title": "Add API Timeout Handling",
+      "description": "Add timeout handling for API requests",
+      "acceptanceCriteria": [
+        "Set 30-second timeout for API requests",
+        "Return friendly error message on timeout",
+        "Include 'retry' suggestion in error response",
+        "Typecheck passes"
+      ],
+      "status": "completed",
+      "dependencies": ["US-029"]
+    },
+    {
+      "id": "US-032",
+      "epic": "AI Analysis Engine",
+      "title": "Add Rate Limit Handling",
+      "description": "Handle API rate limits gracefully",
+      "acceptanceCriteria": [
+        "Detect 429 status code responses",
+        "Parse Retry-After header if present",
+        "Return 'Try again in X seconds' message to client",
+        "Typecheck passes"
+      ],
+      "status": "completed",
+      "dependencies": ["US-029"]
+    },
+    {
+      "id": "US-033",
+      "epic": "AI Analysis Engine",
+      "title": "Add Fallback for Stream Failure",
+      "description": "Add fallback to non-streaming if streaming fails",
+      "acceptanceCriteria": [
+        "Detect streaming failures mid-response",
+        "Retry with non-streaming request as fallback",
+        "Return partial results if available",
+        "Typecheck passes"
+      ],
+      "status": "completed",
+      "dependencies": ["US-031", "US-032"]
+    },
+    {
+      "id": "US-034",
+      "epic": "Score Dashboard",
+      "title": "Create Score Ring Component",
+      "description": "Create circular progress ring for overall score display",
+      "acceptanceCriteria": [
+        "Create /components/analysis/ScoreRing.tsx component",
+        "Render SVG circular progress with animated stroke-dashoffset",
+        "Display score number in center (large, bold)",
+        "Color transitions: red (0-40), yellow (41-70), green (71-100)",
+        "Typecheck passes",
+        "Verify score ring animation in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-001", "US-003", "US-004"]
+    },
+    {
+      "id": "US-035",
+      "epic": "Score Dashboard",
+      "title": "Add Score Count-Up Animation",
+      "description": "Add animated counting from 0 to final score",
+      "acceptanceCriteria": [
+        "Animate number from 0 to final score",
+        "Use spring animation for natural feel",
+        "Duration approximately 1.2 seconds",
+        "Typecheck passes",
+        "Verify count-up animation in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-034"]
+    },
+    {
+      "id": "US-036",
+      "epic": "Score Dashboard",
+      "title": "Add Verdict Label",
+      "description": "Add text verdict below score based on overall_verdict",
+      "acceptanceCriteria": [
+        "Display verdict based on overall_verdict from AI response",
+        "Map to display labels: 'Brutal Honesty Needed', 'Needs Work', 'Solid Foundation', 'Exceptional'",
+        "Style with appropriate color matching score",
+        "Typecheck passes",
+        "Verify verdict label in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-035"]
+    },
+    {
+      "id": "US-037",
+      "epic": "Score Dashboard",
+      "title": "Create Section Scores Component",
+      "description": "Create horizontal bar chart for section scores",
+      "acceptanceCriteria": [
+        "Create /components/analysis/SectionScores.tsx component",
+        "Render horizontal bar for each section",
+        "Show section name, score number, and severity badge",
+        "Typecheck passes",
+        "Verify section scores layout in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-001", "US-008"]
+    },
+    {
+      "id": "US-038",
+      "epic": "Score Dashboard",
+      "title": "Add Section Score Bar Animation",
+      "description": "Add staggered bar fill animation for section scores",
+      "acceptanceCriteria": [
+        "Animate bar fill from left to right",
+        "Stagger animations (100ms delay between bars)",
+        "Total animation duration approximately 800ms per bar",
+        "Color-code bars based on score thresholds",
+        "Typecheck passes",
+        "Verify staggered animation in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-037"]
+    },
+    {
+      "id": "US-039",
+      "epic": "Score Dashboard",
+      "title": "Add Section Click Navigation",
+      "description": "Make section scores clickable to jump to diff view",
+      "acceptanceCriteria": [
+        "Make section rows clickable",
+        "Scroll to corresponding section in diff view on click",
+        "Add hover state to indicate clickability",
+        "Typecheck passes",
+        "Verify click-to-scroll in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-038"]
+    },
+    {
+      "id": "US-040",
+      "epic": "Score Dashboard",
+      "title": "Create Roast Summary Component",
+      "description": "Create component to display the AI roast summary",
+      "acceptanceCriteria": [
+        "Create /components/analysis/RoastSummary.tsx component",
+        "Display roast_summary text from AI response",
+        "Include fire emoji accent",
+        "Style with Card component and distinct visual treatment",
+        "Typecheck passes",
+        "Verify roast summary styling in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-007"]
+    },
+    {
+      "id": "US-041",
+      "epic": "Score Dashboard",
+      "title": "Add Typewriter Animation for Roast",
+      "description": "Add character-by-character typewriter effect for roast text",
+      "acceptanceCriteria": [
+        "Animate text character by character (30ms per char)",
+        "Show blinking cursor during animation",
+        "Support long text with proper wrapping",
+        "Typecheck passes",
+        "Verify typewriter effect in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-040"]
+    },
+    {
+      "id": "US-042",
+      "epic": "Score Dashboard",
+      "title": "Add Expandable Roast Text",
+      "description": "Add expand/collapse for long roast summaries",
+      "acceptanceCriteria": [
+        "Truncate text after 3 lines by default",
+        "Show 'Read more' button if truncated",
+        "Expand with smooth animation on click",
+        "Typecheck passes",
+        "Verify expand/collapse in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-041"]
+    },
+    {
+      "id": "US-043",
+      "epic": "Score Dashboard",
+      "title": "Create Quick Wins Component",
+      "description": "Create interactive checklist for quick wins",
+      "acceptanceCriteria": [
+        "Create /components/analysis/QuickWins.tsx component",
+        "Render quick_wins array as interactive checklist",
+        "Include checkbox for each item",
+        "Store checked state locally",
+        "Typecheck passes",
+        "Verify checklist in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-007"]
+    },
+    {
+      "id": "US-044",
+      "epic": "Score Dashboard",
+      "title": "Add Quick Wins Progress",
+      "description": "Add progress indicator and strikethrough animation",
+      "acceptanceCriteria": [
+        "Display 'X of Y done' progress indicator",
+        "Add strikethrough animation when item is checked",
+        "Update progress count in real-time",
+        "Typecheck passes",
+        "Verify progress indicator in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-043"]
+    },
+    {
+      "id": "US-045",
+      "epic": "Score Dashboard",
+      "title": "Create ATS Keywords Component",
+      "description": "Create pill badges for missing ATS keywords",
+      "acceptanceCriteria": [
+        "Create /components/analysis/AtsKeywords.tsx component",
+        "Display ats_keywords_missing array as pill badges",
+        "Style with muted background and border",
+        "Typecheck passes",
+        "Verify keyword pills in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-001", "US-004"]
+    },
+    {
+      "id": "US-046",
+      "epic": "Score Dashboard",
+      "title": "Add Keyword Copy on Click",
+      "description": "Add click-to-copy functionality for keywords",
+      "acceptanceCriteria": [
+        "Copy keyword to clipboard on click",
+        "Show tooltip 'Copied!' on successful copy",
+        "Add hover state to indicate clickability",
+        "Typecheck passes",
+        "Verify copy functionality in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-009", "US-045"]
+    },
+    {
+      "id": "US-047",
+      "epic": "Before/After Diff View",
+      "title": "Create Diff Container Component",
+      "description": "Create main container with tabs for diff views",
+      "acceptanceCriteria": [
+        "Create /components/diff/DiffContainer.tsx component",
+        "Include Tabs for 'Original', 'Improved', 'Diff' views",
+        "Handle responsive layout (side-by-side on desktop, tabs on mobile)",
+        "Typecheck passes",
+        "Verify diff container layout in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-010"]
+    },
+    {
+      "id": "US-048",
+      "epic": "Before/After Diff View",
+      "title": "Create Diff Panel Component",
+      "description": "Create panel component for displaying text content",
+      "acceptanceCriteria": [
+        "Create /components/diff/DiffPanel.tsx component",
+        "Display text with proper formatting and line breaks",
+        "Support syntax highlighting for diff mode",
+        "Include section header",
+        "Typecheck passes",
+        "Verify diff panel in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-047"]
+    },
+    {
+      "id": "US-049",
+      "epic": "Before/After Diff View",
+      "title": "Implement Word-Level Diff Algorithm",
+      "description": "Create diff algorithm to compare original and improved text",
+      "acceptanceCriteria": [
+        "Create /lib/diff.ts with word-level diff function",
+        "Identify inserted, deleted, and unchanged words",
+        "Return array of diff segments with type markers",
+        "Handle edge cases (empty strings, single words)",
+        "Typecheck passes"
+      ],
+      "status": "completed",
+      "dependencies": ["US-004"]
+    },
+    {
+      "id": "US-050",
+      "epic": "Before/After Diff View",
+      "title": "Create Inline Diff Component",
+      "description": "Create component to render highlighted diff",
+      "acceptanceCriteria": [
+        "Create /components/diff/InlineDiff.tsx component",
+        "Render removed text with red background/strikethrough",
+        "Render added text with green background",
+        "Render unchanged text normally",
+        "Typecheck passes",
+        "Verify diff highlighting in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-049"]
+    },
+    {
+      "id": "US-051",
+      "epic": "Before/After Diff View",
+      "title": "Add Diff Highlight Animation",
+      "description": "Add sequential highlight animation for diff words",
+      "acceptanceCriteria": [
+        "Animate highlights appearing word by word",
+        "Use 50ms stagger between words",
+        "Start animation when section comes into view",
+        "Typecheck passes",
+        "Verify sequential highlight animation in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-050"]
+    },
+    {
+      "id": "US-052",
+      "epic": "Before/After Diff View",
+      "title": "Create Section Navigation Component",
+      "description": "Create scrollable navigation for resume sections",
+      "acceptanceCriteria": [
+        "Create /components/diff/SectionNav.tsx component",
+        "Display section names as scrollable tabs/pills",
+        "Highlight currently active section",
+        "Handle overflow with horizontal scroll",
+        "Typecheck passes",
+        "Verify section navigation in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-001"]
+    },
+    {
+      "id": "US-053",
+      "epic": "Before/After Diff View",
+      "title": "Add Section Jump from Dashboard",
+      "description": "Implement scroll-to-section when clicking scores",
+      "acceptanceCriteria": [
+        "Implement scroll-to-section functionality",
+        "Highlight target section briefly after scroll",
+        "Update active section in SectionNav",
+        "Typecheck passes",
+        "Verify section jump in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-039", "US-052"]
+    },
+    {
+      "id": "US-054",
+      "epic": "Before/After Diff View",
+      "title": "Add Mobile Tab Toggle",
+      "description": "Add tab toggle for mobile screens",
+      "acceptanceCriteria": [
+        "Show tab toggle on screens < 768px",
+        "Implement crossfade animation between views",
+        "Maintain scroll position when switching",
+        "Typecheck passes",
+        "Verify mobile toggle in browser using MCP browser tool (resize viewport)"
+      ],
+      "status": "completed",
+      "dependencies": ["US-047"]
+    },
+    {
+      "id": "US-055",
+      "epic": "Before/After Diff View",
+      "title": "Add Copy Section Button",
+      "description": "Add button to copy improved text per section",
+      "acceptanceCriteria": [
+        "Add 'Copy' button to each section's improved view",
+        "Copy only the improved text for that section",
+        "Show animated checkmark and 'Copied!' toast",
+        "Typecheck passes",
+        "Verify copy functionality in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-006", "US-009", "US-048"]
+    },
+    {
+      "id": "US-056",
+      "epic": "Before/After Diff View",
+      "title": "Add Copy All Button",
+      "description": "Add button to copy all improved sections at once",
+      "acceptanceCriteria": [
+        "Add 'Copy All Improvements' button above diff view",
+        "Concatenate all improved sections with proper formatting",
+        "Show success toast on copy",
+        "Typecheck passes",
+        "Verify copy-all in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-055"]
+    },
+    {
+      "id": "US-057",
+      "epic": "Before/After Diff View",
+      "title": "Add Improvement Notes",
+      "description": "Add expandable improvement notes for each section",
+      "acceptanceCriteria": [
+        "Display improvement_notes for each section",
+        "Collapse notes by default",
+        "Expand on click with smooth animation",
+        "Style with info icon and subtle background",
+        "Typecheck passes",
+        "Verify notes expand/collapse in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-048"]
+    },
+    {
+      "id": "US-058",
+      "epic": "Landing Page & Export",
+      "title": "Create Landing Page Hero",
+      "description": "Update landing page with engaging hero section",
+      "acceptanceCriteria": [
+        "Update /app/page.tsx with hero section",
+        "Add headline: 'Get Your Resume Roasted'",
+        "Add subheadline: 'Brutal AI feedback. Beautiful results.'",
+        "Include fire emoji visual treatment",
+        "Typecheck passes",
+        "Verify hero section in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-001", "US-002"]
+    },
+    {
+      "id": "US-059",
+      "epic": "Landing Page & Export",
+      "title": "Add Header Navigation",
+      "description": "Add sticky header with logo and links",
+      "acceptanceCriteria": [
+        "Add header with 'Resume Roaster' logo/text",
+        "Include GitHub link (icon button, opens in new tab)",
+        "Style with sticky positioning",
+        "Typecheck passes",
+        "Verify header in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-003", "US-006"]
+    },
+    {
+      "id": "US-060",
+      "epic": "Landing Page & Export",
+      "title": "Add Sample Analysis Preview",
+      "description": "Add static preview showing example analysis",
+      "acceptanceCriteria": [
+        "Create static preview showing sample scores and diff",
+        "Use realistic mock data",
+        "Style consistently with actual results",
+        "Animate on scroll into view",
+        "Typecheck passes",
+        "Verify sample preview in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-034", "US-037", "US-050"]
+    },
+    {
+      "id": "US-061",
+      "epic": "Landing Page & Export",
+      "title": "Add Footer",
+      "description": "Add footer with credits and links",
+      "acceptanceCriteria": [
+        "Add footer with 'Built with AI' text",
+        "Include GitHub repository link",
+        "Style with subtle border-top and muted text",
+        "Typecheck passes",
+        "Verify footer in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-001"]
+    },
+    {
+      "id": "US-062",
+      "epic": "Landing Page & Export",
+      "title": "Create Results Page",
+      "description": "Create dedicated results page for analysis display",
+      "acceptanceCriteria": [
+        "Create /app/results/page.tsx",
+        "Accept analysis data via URL state or context",
+        "Include back button to return to upload",
+        "Include export button in header",
+        "Typecheck passes",
+        "Verify results page routing in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-006", "US-059"]
+    },
+    {
+      "id": "US-063",
+      "epic": "Landing Page & Export",
+      "title": "Implement Markdown Export",
+      "description": "Add ability to download analysis as Markdown file",
+      "acceptanceCriteria": [
+        "Create function to generate formatted Markdown",
+        "Include all scores, sections, rewrites, and quick wins",
+        "Format with proper headings and lists",
+        "Trigger download as .md file",
+        "Typecheck passes",
+        "Verify download in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-062"]
+    },
+    {
+      "id": "US-064",
+      "epic": "Landing Page & Export",
+      "title": "Implement URL Sharing",
+      "description": "Add ability to share analysis via URL encoding",
+      "acceptanceCriteria": [
+        "Encode analysis results in URL hash (compressed)",
+        "Decode and restore state when loading shared URL",
+        "Handle very long analyses gracefully (truncate if needed)",
+        "Typecheck passes",
+        "Verify URL sharing in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-062"]
+    },
+    {
+      "id": "US-065",
+      "epic": "Loading States & Animations",
+      "title": "Add PDF Parsing Skeleton",
+      "description": "Add skeleton loader while PDF is parsing",
+      "acceptanceCriteria": [
+        "Create skeleton loader for text preview area",
+        "Animate with subtle pulse effect",
+        "Match dimensions of actual content",
+        "Typecheck passes",
+        "Verify skeleton in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-001", "US-003"]
+    },
+    {
+      "id": "US-066",
+      "epic": "Loading States & Animations",
+      "title": "Add Analysis Loading State",
+      "description": "Add progress display while AI analyzes resume",
+      "acceptanceCriteria": [
+        "Show 'Analyzing your resume...' with animated spinner",
+        "Display progress steps (Reading content -> Scoring sections -> Generating improvements)",
+        "Update steps as streaming response progresses",
+        "Typecheck passes",
+        "Verify loading state in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-003", "US-030"]
+    },
+    {
+      "id": "US-067",
+      "epic": "Loading States & Animations",
+      "title": "Add Streaming Text Reveal",
+      "description": "Reveal AI response content progressively",
+      "acceptanceCriteria": [
+        "Reveal scores as soon as they arrive in stream",
+        "Reveal sections progressively",
+        "Smooth transitions between loading and content states",
+        "Typecheck passes",
+        "Verify streaming reveal in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-030", "US-066"]
+    },
+    {
+      "id": "US-068",
+      "epic": "Loading States & Animations",
+      "title": "Add Page Transitions",
+      "description": "Add Framer Motion page transitions",
+      "acceptanceCriteria": [
+        "Add Framer Motion page transition wrapper",
+        "Use fade + slight Y translate animation",
+        "Duration 200ms",
+        "Typecheck passes",
+        "Verify page transitions in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-003"]
+    },
+    {
+      "id": "US-069",
+      "epic": "Responsive Design & Accessibility",
+      "title": "Mobile Upload Optimization",
+      "description": "Optimize upload experience for mobile screens",
+      "acceptanceCriteria": [
+        "Test upload zone at 375px, 390px, 414px widths",
+        "Ensure touch-friendly tap targets (min 44px)",
+        "Adjust padding and spacing for mobile",
+        "Typecheck passes",
+        "Verify mobile upload in browser using MCP browser tool (resize viewport)"
+      ],
+      "status": "completed",
+      "dependencies": ["US-014"]
+    },
+    {
+      "id": "US-070",
+      "epic": "Responsive Design & Accessibility",
+      "title": "Mobile Score Dashboard Optimization",
+      "description": "Optimize score dashboard for mobile screens",
+      "acceptanceCriteria": [
+        "Stack score ring and section bars vertically on mobile",
+        "Make section scores collapsible",
+        "Ensure all text is readable",
+        "Typecheck passes",
+        "Verify mobile scores in browser using MCP browser tool (resize viewport)"
+      ],
+      "status": "completed",
+      "dependencies": ["US-036", "US-038"]
+    },
+    {
+      "id": "US-071",
+      "epic": "Responsive Design & Accessibility",
+      "title": "Mobile Diff View Optimization",
+      "description": "Optimize diff view for mobile screens",
+      "acceptanceCriteria": [
+        "Use tab toggle instead of side-by-side on mobile",
+        "Enable swipe gesture to switch tabs",
+        "Ensure section navigation is scrollable",
+        "Typecheck passes",
+        "Verify mobile diff view in browser using MCP browser tool (resize viewport)"
+      ],
+      "status": "completed",
+      "dependencies": ["US-054"]
+    },
+    {
+      "id": "US-072",
+      "epic": "Responsive Design & Accessibility",
+      "title": "Tablet Layout Optimization",
+      "description": "Optimize layout for tablet screens",
+      "acceptanceCriteria": [
+        "Test at 768px and 1024px widths",
+        "Use stacked layout with wider components",
+        "Collapsible sections for space efficiency",
+        "Typecheck passes",
+        "Verify tablet layout in browser using MCP browser tool (resize viewport)"
+      ],
+      "status": "completed",
+      "dependencies": ["US-070", "US-071"]
+    },
+    {
+      "id": "US-073",
+      "epic": "Responsive Design & Accessibility",
+      "title": "Add Keyboard Navigation",
+      "description": "Ensure all elements are keyboard accessible",
+      "acceptanceCriteria": [
+        "All interactive elements focusable with Tab key",
+        "Proper focus order throughout app",
+        "Visible focus rings on all elements",
+        "Enter/Space activates buttons and tabs",
+        "Typecheck passes",
+        "Verify keyboard navigation in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-006", "US-010"]
+    },
+    {
+      "id": "US-074",
+      "epic": "Responsive Design & Accessibility",
+      "title": "Add ARIA Labels",
+      "description": "Add proper ARIA labels for accessibility",
+      "acceptanceCriteria": [
+        "Add aria-label to score visualizations",
+        "Add aria-describedby for complex components",
+        "Add sr-only text for color-coded information",
+        "Typecheck passes"
+      ],
+      "status": "completed",
+      "dependencies": ["US-034", "US-037"]
+    },
+    {
+      "id": "US-075",
+      "epic": "Responsive Design & Accessibility",
+      "title": "Add Screen Reader Text for Scores",
+      "description": "Add hidden text for screen reader score descriptions",
+      "acceptanceCriteria": [
+        "Add hidden text describing score severity",
+        "Include both number and text description",
+        "Test with screen reader (or verify aria attributes)",
+        "Typecheck passes"
+      ],
+      "status": "completed",
+      "dependencies": ["US-074"]
+    },
+    {
+      "id": "US-076",
+      "epic": "Performance & Polish",
+      "title": "Lazy Load Diff View",
+      "description": "Optimize diff computation to only run when needed",
+      "acceptanceCriteria": [
+        "Only compute diff when Diff tab is active",
+        "Memoize computed diffs",
+        "Show skeleton while computing",
+        "Typecheck passes",
+        "Verify lazy loading in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-049", "US-065"]
+    },
+    {
+      "id": "US-077",
+      "epic": "Performance & Polish",
+      "title": "Memoize Animation Components",
+      "description": "Prevent unnecessary re-renders of animated components",
+      "acceptanceCriteria": [
+        "Wrap score animations in React.memo",
+        "Use useMemo for computed values",
+        "Verify no animation jank on state updates",
+        "Typecheck passes",
+        "Verify smooth animations in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-034", "US-037"]
+    },
+    {
+      "id": "US-078",
+      "epic": "Performance & Polish",
+      "title": "Optimize PDF Parse Import",
+      "description": "Ensure pdf-parse only loads server-side",
+      "acceptanceCriteria": [
+        "Ensure pdf-parse only loads server-side",
+        "Use dynamic import if needed",
+        "Verify bundle size is reasonable",
+        "Typecheck passes"
+      ],
+      "status": "completed",
+      "dependencies": ["US-015"]
+    },
+    {
+      "id": "US-079",
+      "epic": "Performance & Polish",
+      "title": "Add Error Boundary",
+      "description": "Add error boundary for graceful error handling",
+      "acceptanceCriteria": [
+        "Create error boundary component",
+        "Display friendly error message",
+        "Include 'Try again' button",
+        "Log errors for debugging",
+        "Typecheck passes",
+        "Verify error boundary in browser using MCP browser tool"
+      ],
+      "status": "completed",
+      "dependencies": ["US-006", "US-007"]
+    },
+    {
+      "id": "US-080",
+      "epic": "Performance & Polish",
+      "title": "Final Integration Test",
+      "description": "Verify complete user flow works end-to-end",
+      "acceptanceCriteria": [
+        "Test complete flow: upload -> select role -> analyze -> view results -> export",
+        "Verify streaming works end-to-end",
+        "Verify all animations play correctly",
+        "Verify responsive design at all breakpoints",
+        "Typecheck passes",
+        "Verify full flow in browser using MCP browser tool"
+      ],
+      "status": "pending",
+      "dependencies": ["US-063", "US-064", "US-067", "US-072", "US-075", "US-076", "US-077", "US-078", "US-079"]
+    }
+  ]
+}
