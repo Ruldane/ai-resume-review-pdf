@@ -177,3 +177,37 @@ export async function createRequest(
 
   return response.json();
 }
+
+/**
+ * Builds the analysis prompt with user inputs
+ * @param resumeText - The extracted resume text
+ * @param targetRole - The target job role
+ * @param company - Optional target company name
+ */
+export function buildAnalysisPrompt(
+  resumeText: string,
+  targetRole: string,
+  company?: string
+): string {
+  const companyContext = company
+    ? `\nTarget Company: ${company}`
+    : "";
+
+  return `Please analyze the following resume for a ${targetRole} position.${companyContext}
+
+<RESUME>
+${resumeText}
+</RESUME>
+
+Analyze this resume thoroughly and provide your feedback as a JSON object following the exact schema specified in your instructions. Focus on:
+
+1. Overall impression and scoring
+2. Section-by-section analysis with specific feedback
+3. ATS optimization for the ${targetRole} role${company ? ` at ${company}` : ""}
+4. Quick wins that would immediately improve the resume
+5. If there's a summary section, provide a rewritten version
+
+Remember: Be brutally honest but constructive. Your goal is to help this person land their dream job.
+
+Respond ONLY with valid JSON. No markdown code blocks, no explanation text before or after - just the JSON object.`;
+}
