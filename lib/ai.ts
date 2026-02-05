@@ -120,8 +120,28 @@ export function getAuthHeaders(): Record<string, string> {
   };
 }
 
+// Custom error types for better error handling
+export class AITimeoutError extends Error {
+  constructor() {
+    super("Request timed out. Please try again.");
+    this.name = "AITimeoutError";
+  }
+}
+
+export class AIRateLimitError extends Error {
+  retryAfter: number;
+
+  constructor(retryAfter: number) {
+    super(`Rate limited. Try again in ${retryAfter} seconds.`);
+    this.name = "AIRateLimitError";
+    this.retryAfter = retryAfter;
+  }
+}
+
+const REQUEST_TIMEOUT_MS = 30000; // 30 seconds
+
 /**
- * Creates a streaming request to the Z AI API
+ * Creates a streaming request to the Z AI API with timeout handling
  */
 export async function createStreamingRequest(
   systemPrompt: string,
@@ -135,22 +155,44 @@ export async function createStreamingRequest(
     stream: true,
   };
 
-  const response = await fetch(AI_CONFIG.baseUrl, {
-    method: "POST",
-    headers: getAuthHeaders(),
-    body: JSON.stringify(body),
-  });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`AI API error: ${response.status} - ${errorText}`);
+  try {
+    const response = await fetch(AI_CONFIG.baseUrl, {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    // Handle rate limiting
+    if (response.status === 429) {
+      const retryAfter = parseInt(response.headers.get("Retry-After") || "60", 10);
+      throw new AIRateLimitError(retryAfter);
+    }
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`AI API error: ${response.status} - ${errorText}`);
+    }
+
+    return response;
+  } catch (error) {
+    clearTimeout(timeoutId);
+
+    if (error instanceof Error && error.name === "AbortError") {
+      throw new AITimeoutError();
+    }
+
+    throw error;
   }
-
-  return response;
 }
 
 /**
- * Creates a non-streaming request to the Z AI API
+ * Creates a non-streaming request to the Z AI API (fallback)
  */
 export async function createRequest(
   systemPrompt: string,
@@ -164,18 +206,63 @@ export async function createRequest(
     stream: false,
   };
 
-  const response = await fetch(AI_CONFIG.baseUrl, {
-    method: "POST",
-    headers: getAuthHeaders(),
-    body: JSON.stringify(body),
-  });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`AI API error: ${response.status} - ${errorText}`);
+  try {
+    const response = await fetch(AI_CONFIG.baseUrl, {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+
+    clearTimeout(timeoutId);
+
+    // Handle rate limiting
+    if (response.status === 429) {
+      const retryAfter = parseInt(response.headers.get("Retry-After") || "60", 10);
+      throw new AIRateLimitError(retryAfter);
+    }
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`AI API error: ${response.status} - ${errorText}`);
+    }
+
+    return response.json();
+  } catch (error) {
+    clearTimeout(timeoutId);
+
+    if (error instanceof Error && error.name === "AbortError") {
+      throw new AITimeoutError();
+    }
+
+    throw error;
   }
+}
 
-  return response.json();
+/**
+ * Creates a request with automatic fallback from streaming to non-streaming
+ */
+export async function createRequestWithFallback(
+  systemPrompt: string,
+  userMessage: string
+): Promise<{ response: Response; isStreaming: boolean } | AIResponse> {
+  try {
+    const response = await createStreamingRequest(systemPrompt, userMessage);
+    return { response, isStreaming: true };
+  } catch (streamError) {
+    console.warn("Streaming request failed, falling back to non-streaming:", streamError);
+
+    // Don't retry on rate limit or timeout
+    if (streamError instanceof AIRateLimitError || streamError instanceof AITimeoutError) {
+      throw streamError;
+    }
+
+    // Fallback to non-streaming
+    return createRequest(systemPrompt, userMessage);
+  }
 }
 
 /**
