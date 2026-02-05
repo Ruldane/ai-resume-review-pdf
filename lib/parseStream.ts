@@ -144,3 +144,67 @@ export function createStreamParser() {
     },
   };
 }
+
+/**
+ * Parse a streaming SSE response from the analyze API
+ */
+export async function parseAnalysisStream(
+  response: Response,
+  onProgress?: (step: "score" | "sections" | "complete") => void
+): Promise<AnalysisResponse | null> {
+  const reader = response.body?.getReader();
+  if (!reader) return null;
+
+  const decoder = new TextDecoder();
+  let result: AnalysisResponse | null = null;
+  let currentEvent = "";
+  let buffer = "";
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+
+      // Process complete SSE messages
+      const lines = buffer.split("\n");
+      buffer = lines.pop() || ""; // Keep incomplete line in buffer
+
+      for (const line of lines) {
+        if (line.startsWith("event: ")) {
+          currentEvent = line.slice(7);
+
+          // Update progress based on event type
+          if (currentEvent === "status" && onProgress) {
+            onProgress("score");
+          } else if (currentEvent === "chunk" && onProgress) {
+            onProgress("sections");
+          }
+        } else if (line.startsWith("data: ")) {
+          const data = line.slice(6);
+
+          try {
+            const parsed = JSON.parse(data);
+
+            // Check if this is the final result event
+            if (currentEvent === "result" && parsed.overall_score !== undefined) {
+              result = parsed as AnalysisResponse;
+              if (onProgress) {
+                onProgress("complete");
+              }
+            }
+          } catch {
+            // Not valid JSON yet, continue
+          }
+        }
+      }
+    }
+
+    return result;
+  } finally {
+    reader.releaseLock();
+  }
+}
+
+import type { AnalysisResponse } from "./types";
