@@ -1,46 +1,135 @@
 "use client";
 
-import { forwardRef, type HTMLAttributes } from "react";
+import {
+  forwardRef,
+  useState,
+  useCallback,
+  type DragEvent,
+} from "react";
+import { motion } from "framer-motion";
 import { Upload } from "lucide-react";
 import { cn } from "@/lib/cn";
 
-export interface DropZoneProps extends HTMLAttributes<HTMLDivElement> {
+export interface DropZoneProps {
   onFileSelect?: (file: File) => void;
   disabled?: boolean;
+  className?: string;
 }
 
 const DropZone = forwardRef<HTMLDivElement, DropZoneProps>(
-  ({ className, onFileSelect, disabled, ...props }, ref) => {
+  ({ className, onFileSelect, disabled }, ref) => {
+    const [isDragOver, setIsDragOver] = useState(false);
+
+    const handleDragOver = useCallback((e: DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      e.stopPropagation();
+    }, []);
+
+    const handleDragEnter = useCallback((e: DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (!disabled) {
+        setIsDragOver(true);
+      }
+    }, [disabled]);
+
+    const handleDragLeave = useCallback((e: DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      e.stopPropagation();
+      // Only set to false if leaving the drop zone entirely
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = e.clientX;
+      const y = e.clientY;
+      if (x < rect.left || x >= rect.right || y < rect.top || y >= rect.bottom) {
+        setIsDragOver(false);
+      }
+    }, []);
+
+    const handleDrop = useCallback(
+      (e: DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragOver(false);
+
+        if (disabled) return;
+
+        const files = e.dataTransfer.files;
+        if (files && files.length > 0) {
+          onFileSelect?.(files[0]);
+        }
+      },
+      [disabled, onFileSelect]
+    );
+
     return (
-      <div
+      <motion.div
         ref={ref}
+        onDragOver={handleDragOver}
+        onDragEnter={handleDragEnter}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        animate={{
+          scale: isDragOver ? 1.02 : 1,
+        }}
+        transition={{ type: "spring", stiffness: 400, damping: 25 }}
         className={cn(
           "relative flex flex-col items-center justify-center gap-4",
           "w-full p-12 rounded-[var(--radius-card)]",
           "border-2 border-dashed border-border",
           "bg-bg-card/50 hover:bg-bg-card",
-          "transition-all duration-200 ease-out",
+          "transition-colors duration-200 ease-out",
           "cursor-pointer",
+          isDragOver && "bg-accent/5 border-accent",
           disabled && "opacity-50 cursor-not-allowed pointer-events-none",
           className
         )}
-        {...props}
       >
         {/* Upload Icon */}
-        <div className="flex items-center justify-center w-16 h-16 rounded-full bg-bg-elevated">
-          <Upload className="w-8 h-8 text-text-secondary" />
-        </div>
+        <motion.div
+          animate={{
+            scale: isDragOver ? 1.1 : 1,
+            y: isDragOver ? -4 : 0,
+          }}
+          transition={{ type: "spring", stiffness: 400, damping: 25 }}
+          className={cn(
+            "flex items-center justify-center w-16 h-16 rounded-full",
+            isDragOver ? "bg-accent/20" : "bg-bg-elevated"
+          )}
+        >
+          <Upload
+            className={cn(
+              "w-8 h-8 transition-colors",
+              isDragOver ? "text-accent" : "text-text-secondary"
+            )}
+          />
+        </motion.div>
 
         {/* Main Text */}
         <div className="text-center">
-          <p className="text-text-primary font-medium">
-            Drop your resume here or click to browse
+          <p
+            className={cn(
+              "font-medium transition-colors",
+              isDragOver ? "text-accent" : "text-text-primary"
+            )}
+          >
+            {isDragOver
+              ? "Drop your file here"
+              : "Drop your resume here or click to browse"}
           </p>
           <p className="text-text-secondary text-sm mt-1">
             PDF only &bull; Max 5MB
           </p>
         </div>
-      </div>
+
+        {/* Pulse animation when dragging */}
+        {isDragOver && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="absolute inset-0 rounded-[var(--radius-card)] border-2 border-accent animate-pulse pointer-events-none"
+          />
+        )}
+      </motion.div>
     );
   }
 );
