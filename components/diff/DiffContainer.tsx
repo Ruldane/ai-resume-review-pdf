@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, useState, useEffect } from "react";
+import { forwardRef, useState, useEffect, useCallback, useMemo, memo, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FileText, Sparkles, GitCompare } from "lucide-react";
 import { Tabs, TabList, Tab, TabPanel } from "@/components/ui/Tabs";
@@ -13,6 +13,55 @@ export interface DiffContainerProps {
   renderDiff?: (original: string, improved: string) => React.ReactNode;
   className?: string;
 }
+
+// Skeleton component for diff loading state
+const DiffSkeleton = memo(function DiffSkeleton() {
+  return (
+    <div className="space-y-3 animate-pulse">
+      <div className="flex gap-2">
+        <div className="h-4 bg-danger/10 rounded w-1/4" />
+        <div className="h-4 bg-success/10 rounded w-1/3" />
+      </div>
+      <div className="h-4 bg-bg-elevated rounded w-full" />
+      <div className="flex gap-2">
+        <div className="h-4 bg-bg-elevated rounded w-2/3" />
+        <div className="h-4 bg-success/10 rounded w-1/4" />
+      </div>
+      <div className="h-4 bg-bg-elevated rounded w-5/6" />
+      <div className="flex gap-2">
+        <div className="h-4 bg-danger/10 rounded w-1/5" />
+        <div className="h-4 bg-success/10 rounded w-2/5" />
+      </div>
+    </div>
+  );
+});
+
+// Lazy diff renderer that only computes when mounted
+const LazyDiffContent = memo(function LazyDiffContent({
+  renderDiff,
+  originalText,
+  improvedText,
+}: {
+  renderDiff: (original: string, improved: string) => React.ReactNode;
+  originalText: string;
+  improvedText: string;
+}) {
+  const [isReady, setIsReady] = useState(false);
+
+  // Delay rendering slightly to show skeleton and allow UI to settle
+  useEffect(() => {
+    const timer = requestAnimationFrame(() => {
+      setIsReady(true);
+    });
+    return () => cancelAnimationFrame(timer);
+  }, []);
+
+  if (!isReady) {
+    return <DiffSkeleton />;
+  }
+
+  return <>{renderDiff(originalText, improvedText)}</>;
+});
 
 const DiffContainer = forwardRef<HTMLDivElement, DiffContainerProps>(
   ({ originalText, improvedText, renderDiff, className }, ref) => {
@@ -108,7 +157,11 @@ const DiffContainer = forwardRef<HTMLDivElement, DiffContainerProps>(
                 </div>
                 <div className="p-4 max-h-[500px] overflow-auto">
                   {renderDiff ? (
-                    renderDiff(originalText, improvedText)
+                    <LazyDiffContent
+                      renderDiff={renderDiff}
+                      originalText={originalText}
+                      improvedText={improvedText}
+                    />
                   ) : (
                     <pre className="whitespace-pre-wrap text-sm text-text-primary font-sans leading-relaxed">
                       {improvedText}
@@ -190,7 +243,11 @@ const DiffContainer = forwardRef<HTMLDivElement, DiffContainerProps>(
                 </div>
                 <div className="p-4 max-h-[400px] overflow-auto">
                   {renderDiff ? (
-                    renderDiff(originalText, improvedText)
+                    <LazyDiffContent
+                      renderDiff={renderDiff}
+                      originalText={originalText}
+                      improvedText={improvedText}
+                    />
                   ) : (
                     <pre className="whitespace-pre-wrap text-sm text-text-primary font-sans leading-relaxed">
                       {improvedText}
