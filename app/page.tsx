@@ -13,6 +13,7 @@ import {
 import { Badge } from "@/components/ui/Badge";
 import { useToast } from "@/components/ui/Toast";
 import { Tabs, TabList, Tab, TabPanel } from "@/components/ui/Tabs";
+import { DropZone } from "@/components/upload/DropZone";
 
 export default function Home() {
   const [loading, setLoading] = useState(false);
@@ -115,6 +116,12 @@ export default function Home() {
             <Button size="sm">Continue</Button>
           </CardFooter>
         </Card>
+
+        {/* DropZone Demo */}
+        <div className="max-w-lg w-full">
+          <h3 className="text-text-secondary text-sm mb-3">Drop Zone</h3>
+          <DropZone />
+        </div>
 
         {/* Tabs Demo */}
         <Card className="max-w-lg w-full">
