@@ -1,8 +1,8 @@
 "use client";
 
-import { forwardRef, useState } from "react";
+import { forwardRef, useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Zap, ArrowUp, ArrowRight, ArrowDown, Check } from "lucide-react";
+import { Zap, ArrowUp, ArrowRight, ArrowDown, Check, CheckCircle2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { cn } from "@/lib/cn";
 
@@ -44,6 +44,14 @@ const QuickWins = forwardRef<HTMLDivElement, QuickWinsProps>(
       });
     };
 
+    const completedCount = checkedItems.size;
+    const totalCount = quickWins.length;
+    const progressPercentage = useMemo(
+      () => (totalCount > 0 ? (completedCount / totalCount) * 100 : 0),
+      [completedCount, totalCount]
+    );
+    const allCompleted = completedCount === totalCount && totalCount > 0;
+
     return (
       <motion.div
         ref={ref}
@@ -54,11 +62,62 @@ const QuickWins = forwardRef<HTMLDivElement, QuickWinsProps>(
       >
         <Card>
           <CardHeader className="pb-4">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-accent/10">
-                <Zap className="w-5 h-5 text-accent" />
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-accent/10">
+                  <Zap className="w-5 h-5 text-accent" />
+                </div>
+                <CardTitle className="text-text-primary">Quick Wins</CardTitle>
               </div>
-              <CardTitle className="text-text-primary">Quick Wins</CardTitle>
+
+              {/* Progress indicator */}
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <motion.div
+                    initial={false}
+                    animate={{
+                      scale: allCompleted ? [1, 1.2, 1] : 1,
+                    }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <CheckCircle2
+                      className={cn(
+                        "w-5 h-5 transition-colors duration-300",
+                        allCompleted ? "text-success" : "text-text-secondary/50"
+                      )}
+                    />
+                  </motion.div>
+                  <span className="text-sm font-medium text-text-secondary">
+                    <motion.span
+                      key={completedCount}
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className={cn(
+                        "inline-block transition-colors duration-300",
+                        allCompleted ? "text-success" : "text-text-primary"
+                      )}
+                    >
+                      {completedCount}
+                    </motion.span>
+                    <span className="mx-1">of</span>
+                    <span>{totalCount}</span>
+                    <span className="ml-1">done</span>
+                  </span>
+                </div>
+
+                {/* Progress bar */}
+                <div className="w-24 h-2 bg-bg-elevated rounded-full overflow-hidden">
+                  <motion.div
+                    className={cn(
+                      "h-full rounded-full transition-colors duration-300",
+                      allCompleted ? "bg-success" : "bg-accent"
+                    )}
+                    initial={{ width: 0 }}
+                    animate={{ width: `${progressPercentage}%` }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                  />
+                </div>
+              </div>
             </div>
           </CardHeader>
           <CardContent className="pt-0">
