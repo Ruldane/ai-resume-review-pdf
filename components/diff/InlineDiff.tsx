@@ -1,7 +1,7 @@
 "use client";
 
-import { forwardRef, useMemo } from "react";
-import { motion } from "framer-motion";
+import { forwardRef, useMemo, useState, useEffect, useRef } from "react";
+import { motion, useInView } from "framer-motion";
 import { computeDiff, type DiffSegment } from "@/lib/diff";
 import { cn } from "@/lib/cn";
 
@@ -11,17 +11,40 @@ export interface InlineDiffProps {
   className?: string;
   animate?: boolean;
   staggerDelay?: number;
+  animateOnView?: boolean;
 }
 
 const InlineDiff = forwardRef<HTMLDivElement, InlineDiffProps>(
-  ({ original, improved, className, animate = false, staggerDelay = 0.05 }, ref) => {
+  (
+    {
+      original,
+      improved,
+      className,
+      animate = false,
+      staggerDelay = 0.05,
+      animateOnView = false,
+    },
+    ref
+  ) => {
+    const internalRef = useRef<HTMLDivElement>(null);
+    const combinedRef = (ref as React.RefObject<HTMLDivElement>) || internalRef;
+    const isInView = useInView(combinedRef, { once: true, amount: 0.3 });
+    const [hasAnimated, setHasAnimated] = useState(false);
+
+    const shouldAnimate = animate || (animateOnView && isInView);
+
+    useEffect(() => {
+      if (isInView && animateOnView && !hasAnimated) {
+        setHasAnimated(true);
+      }
+    }, [isInView, animateOnView, hasAnimated]);
     const segments = useMemo(
       () => computeDiff(original, improved),
       [original, improved]
     );
 
     const renderSegment = (segment: DiffSegment, index: number) => {
-      const baseProps = animate
+      const baseProps = shouldAnimate
         ? {
             initial: { opacity: 0, scale: 0.95 },
             animate: { opacity: 1, scale: 1 },
@@ -60,7 +83,7 @@ const InlineDiff = forwardRef<HTMLDivElement, InlineDiffProps>(
 
         case "unchanged":
         default:
-          return animate ? (
+          return shouldAnimate ? (
             <motion.span
               key={`unchanged-${index}`}
               {...baseProps}
@@ -78,7 +101,7 @@ const InlineDiff = forwardRef<HTMLDivElement, InlineDiffProps>(
 
     return (
       <div
-        ref={ref}
+        ref={combinedRef}
         className={cn(
           "whitespace-pre-wrap text-sm font-sans leading-relaxed",
           className
