@@ -120,7 +120,10 @@ export default function Home() {
         {/* DropZone Demo */}
         <div className="max-w-lg w-full">
           <h3 className="text-text-secondary text-sm mb-3">Drop Zone</h3>
-          <DropZone />
+          <DropZone
+            onFileSelect={(file) => addToast({ type: "success", message: `Selected: ${file.name}` })}
+            onValidationError={(error) => addToast({ type: "error", message: error })}
+          />
         </div>
 
         {/* Tabs Demo */}

@@ -14,14 +14,52 @@ import { cn } from "@/lib/cn";
 
 export interface DropZoneProps {
   onFileSelect?: (file: File) => void;
+  onValidationError?: (error: string) => void;
   disabled?: boolean;
   className?: string;
+  maxSizeMB?: number;
 }
 
+const MAX_FILE_SIZE_MB = 5;
+
 const DropZone = forwardRef<HTMLDivElement, DropZoneProps>(
-  ({ className, onFileSelect, disabled }, ref) => {
+  ({ className, onFileSelect, onValidationError, disabled, maxSizeMB = MAX_FILE_SIZE_MB }, ref) => {
     const [isDragOver, setIsDragOver] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const validateFile = useCallback(
+      (file: File): string | null => {
+        // Check file type
+        if (!file.type || file.type !== "application/pdf") {
+          // Also check file extension as fallback
+          const extension = file.name.split(".").pop()?.toLowerCase();
+          if (extension !== "pdf") {
+            return "Invalid file type. Please upload a PDF file.";
+          }
+        }
+
+        // Check file size
+        const maxSizeBytes = maxSizeMB * 1024 * 1024;
+        if (file.size > maxSizeBytes) {
+          return `File too large. Maximum size is ${maxSizeMB}MB.`;
+        }
+
+        return null;
+      },
+      [maxSizeMB]
+    );
+
+    const handleFile = useCallback(
+      (file: File) => {
+        const error = validateFile(file);
+        if (error) {
+          onValidationError?.(error);
+          return;
+        }
+        onFileSelect?.(file);
+      },
+      [validateFile, onValidationError, onFileSelect]
+    );
 
     const handleDragOver = useCallback((e: DragEvent<HTMLDivElement>) => {
       e.preventDefault();
@@ -58,10 +96,10 @@ const DropZone = forwardRef<HTMLDivElement, DropZoneProps>(
 
         const files = e.dataTransfer.files;
         if (files && files.length > 0) {
-          onFileSelect?.(files[0]);
+          handleFile(files[0]);
         }
       },
-      [disabled, onFileSelect]
+      [disabled, handleFile]
     );
 
     const handleClick = useCallback(() => {
@@ -74,12 +112,12 @@ const DropZone = forwardRef<HTMLDivElement, DropZoneProps>(
       (e: ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
         if (files && files.length > 0) {
-          onFileSelect?.(files[0]);
+          handleFile(files[0]);
         }
         // Reset input so the same file can be selected again
         e.target.value = "";
       },
-      [onFileSelect]
+      [handleFile]
     );
 
     return (
