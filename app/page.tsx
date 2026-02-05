@@ -15,11 +15,24 @@ import { useToast } from "@/components/ui/Toast";
 import { Tabs, TabList, Tab, TabPanel } from "@/components/ui/Tabs";
 import { DropZone } from "@/components/upload/DropZone";
 import { FilePreview } from "@/components/upload/FilePreview";
+import { UploadProgress } from "@/components/upload/UploadProgress";
 
 export default function Home() {
   const [loading, setLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isParsing, setIsParsing] = useState(false);
   const { addToast } = useToast();
+
+  const handleFileSelect = async (file: File) => {
+    setIsParsing(true);
+
+    // Simulate parsing delay to show the animation
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+
+    setIsParsing(false);
+    setSelectedFile(file);
+    addToast({ type: "success", message: `Selected: ${file.name}` });
+  };
 
   const handleLoadingDemo = () => {
     setLoading(true);
@@ -122,17 +135,16 @@ export default function Home() {
         {/* DropZone Demo */}
         <div className="max-w-lg w-full space-y-3">
           <h3 className="text-text-secondary text-sm">Drop Zone</h3>
-          {selectedFile ? (
+          {isParsing ? (
+            <UploadProgress message="Parsing resume..." />
+          ) : selectedFile ? (
             <FilePreview
               file={selectedFile}
               onRemove={() => setSelectedFile(null)}
             />
           ) : (
             <DropZone
-              onFileSelect={(file) => {
-                setSelectedFile(file);
-                addToast({ type: "success", message: `Selected: ${file.name}` });
-              }}
+              onFileSelect={handleFileSelect}
               onValidationError={(error) => addToast({ type: "error", message: error })}
             />
           )}
