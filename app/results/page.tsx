@@ -17,6 +17,7 @@ import { ImprovementNotes } from "@/components/diff/ImprovementNotes";
 import { SectionNav } from "@/components/diff/SectionNav";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { cn } from "@/lib/cn";
+import { downloadMarkdown } from "@/lib/export";
 import type { AnalysisResponse, SectionAnalysis } from "@/lib/types";
 
 // Map API verdict to component verdict
@@ -97,8 +98,7 @@ export default function ResultsPage() {
 
   const handleExport = () => {
     if (!analysis) return;
-    // Export functionality will be added in US-063
-    console.log("Export clicked");
+    downloadMarkdown(analysis);
   };
 
   const handleShare = () => {
