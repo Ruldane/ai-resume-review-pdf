@@ -10,6 +10,7 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
 
 export default function Home() {
   const [loading, setLoading] = useState(false);
@@ -61,14 +62,22 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Color swatches */}
+              {/* Badge variants */}
               <div>
-                <h3 className="text-text-secondary text-sm mb-3">Color Tokens</h3>
-                <div className="flex gap-2">
-                  <div className="w-8 h-8 rounded bg-accent" title="Accent"></div>
-                  <div className="w-8 h-8 rounded bg-success" title="Success"></div>
-                  <div className="w-8 h-8 rounded bg-warning" title="Warning"></div>
-                  <div className="w-8 h-8 rounded bg-danger" title="Danger"></div>
+                <h3 className="text-text-secondary text-sm mb-3">Badge Variants</h3>
+                <div className="flex flex-wrap gap-2">
+                  <Badge variant="good">Good</Badge>
+                  <Badge variant="warning">Warning</Badge>
+                  <Badge variant="critical">Critical</Badge>
+                  <Badge variant="neutral">Neutral</Badge>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-text-secondary text-sm mb-3">Badge Sizes</h3>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge size="sm" variant="good">Small</Badge>
+                  <Badge size="default" variant="good">Default</Badge>
                 </div>
               </div>
             </div>
