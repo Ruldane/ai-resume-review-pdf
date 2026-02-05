@@ -11,13 +11,24 @@ import {
   CardFooter,
 } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
+import { useToast } from "@/components/ui/Toast";
 
 export default function Home() {
   const [loading, setLoading] = useState(false);
+  const { addToast } = useToast();
 
   const handleLoadingDemo = () => {
     setLoading(true);
     setTimeout(() => setLoading(false), 2000);
+  };
+
+  const showToast = (type: "success" | "error" | "info") => {
+    const messages = {
+      success: "Operation completed successfully!",
+      error: "Something went wrong. Please try again.",
+      info: "Here's some helpful information.",
+    };
+    addToast({ type, message: messages[type] });
   };
 
   return (
@@ -78,6 +89,22 @@ export default function Home() {
                 <div className="flex flex-wrap items-center gap-2">
                   <Badge size="sm" variant="good">Small</Badge>
                   <Badge size="default" variant="good">Default</Badge>
+                </div>
+              </div>
+
+              {/* Toast demo */}
+              <div>
+                <h3 className="text-text-secondary text-sm mb-3">Toast Notifications</h3>
+                <div className="flex flex-wrap gap-2">
+                  <Button size="sm" variant="secondary" onClick={() => showToast("success")}>
+                    Success Toast
+                  </Button>
+                  <Button size="sm" variant="secondary" onClick={() => showToast("error")}>
+                    Error Toast
+                  </Button>
+                  <Button size="sm" variant="secondary" onClick={() => showToast("info")}>
+                    Info Toast
+                  </Button>
                 </div>
               </div>
             </div>
