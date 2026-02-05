@@ -17,7 +17,8 @@ import { ImprovementNotes } from "@/components/diff/ImprovementNotes";
 import { SectionNav } from "@/components/diff/SectionNav";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
 import { cn } from "@/lib/cn";
-import { downloadMarkdown } from "@/lib/export";
+import { downloadMarkdown, copyShareUrl, decodeAnalysisFromUrl } from "@/lib/export";
+import { useToast } from "@/components/ui/Toast";
 import type { AnalysisResponse, SectionAnalysis } from "@/lib/types";
 
 // Map API verdict to component verdict
@@ -49,6 +50,7 @@ function mapQuickWins(
 
 export default function ResultsPage() {
   const router = useRouter();
+  const { addToast } = useToast();
   const [analysis, setAnalysis] = useState<AnalysisResponse | null>(null);
   const [activeSection, setActiveSection] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
@@ -72,14 +74,13 @@ export default function ResultsPage() {
       // Try to decode from URL hash
       const hash = window.location.hash.slice(1);
       if (hash) {
-        try {
-          const decoded = decodeURIComponent(atob(hash));
-          const parsed = JSON.parse(decoded) as AnalysisResponse;
+        const parsed = decodeAnalysisFromUrl(hash);
+        if (parsed) {
           setAnalysis(parsed);
           if (parsed.sections.length > 0) {
             setActiveSection(parsed.sections[0].name);
           }
-        } catch {
+        } else {
           // Invalid data, redirect back
           router.push("/");
         }
@@ -101,10 +102,22 @@ export default function ResultsPage() {
     downloadMarkdown(analysis);
   };
 
-  const handleShare = () => {
+  const handleShare = async () => {
     if (!analysis) return;
-    // Share functionality will be added in US-064
-    console.log("Share clicked");
+    const success = await copyShareUrl(analysis);
+    if (success) {
+      addToast({
+        type: "success",
+        message: "Share link copied to clipboard!",
+        duration: 3000,
+      });
+    } else {
+      addToast({
+        type: "error",
+        message: "Failed to copy share link",
+        duration: 3000,
+      });
+    }
   };
 
   const handleSectionChange = (section: string) => {

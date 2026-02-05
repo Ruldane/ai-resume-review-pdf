@@ -144,3 +144,90 @@ export function downloadMarkdown(analysis: AnalysisResponse, filename?: string):
 
   URL.revokeObjectURL(url);
 }
+
+/**
+ * Compress and encode analysis for URL sharing
+ * Uses base64 encoding with optional truncation for very long analyses
+ */
+export function encodeAnalysisForUrl(analysis: AnalysisResponse): string {
+  // Create a minimal version for sharing
+  const minimalAnalysis = {
+    overall_score: analysis.overall_score,
+    overall_verdict: analysis.overall_verdict,
+    roast_summary: truncateText(analysis.roast_summary, 500),
+    sections: analysis.sections.map((s) => ({
+      name: s.name,
+      score: s.score,
+      severity: s.severity,
+      original: truncateText(s.original, 300),
+      improved: truncateText(s.improved, 300),
+      improvement_notes: truncateText(s.improvement_notes, 200),
+    })),
+    ats_analysis: {
+      keywords_found: analysis.ats_analysis.keywords_found.slice(0, 10),
+      keywords_missing: analysis.ats_analysis.keywords_missing.slice(0, 10),
+      score: analysis.ats_analysis.score,
+    },
+    quick_wins: analysis.quick_wins.slice(0, 5).map((qw) => ({
+      id: qw.id,
+      text: truncateText(qw.text, 100),
+      priority: qw.priority,
+    })),
+  };
+
+  const json = JSON.stringify(minimalAnalysis);
+  const encoded = btoa(encodeURIComponent(json));
+
+  return encoded;
+}
+
+/**
+ * Decode analysis from URL hash
+ */
+export function decodeAnalysisFromUrl(hash: string): AnalysisResponse | null {
+  try {
+    const decoded = decodeURIComponent(atob(hash));
+    const parsed = JSON.parse(decoded) as AnalysisResponse;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Generate shareable URL with encoded analysis
+ */
+export function generateShareUrl(analysis: AnalysisResponse): string {
+  const encoded = encodeAnalysisForUrl(analysis);
+  const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
+  return `${baseUrl}/results#${encoded}`;
+}
+
+/**
+ * Copy URL to clipboard
+ */
+export async function copyShareUrl(analysis: AnalysisResponse): Promise<boolean> {
+  const url = generateShareUrl(analysis);
+
+  try {
+    await navigator.clipboard.writeText(url);
+    return true;
+  } catch {
+    // Fallback for older browsers
+    const textArea = document.createElement("textarea");
+    textArea.value = url;
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand("copy");
+    document.body.removeChild(textArea);
+    return true;
+  }
+}
+
+/**
+ * Truncate text to specified length with ellipsis
+ */
+function truncateText(text: string, maxLength: number): string {
+  if (!text || text.length <= maxLength) return text;
+  return text.slice(0, maxLength - 3) + "...";
+}
