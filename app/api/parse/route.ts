@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PDFParse } from "pdf-parse";
 
+const MAX_FILE_SIZE_MB = 5;
+const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
@@ -13,22 +16,50 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check file size
+    if (file.size > MAX_FILE_SIZE_BYTES) {
+      return NextResponse.json(
+        { success: false, error: `File too large. Maximum size is ${MAX_FILE_SIZE_MB}MB.` },
+        { status: 400 }
+      );
+    }
+
     // Convert File to Buffer
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
     // Parse PDF using PDFParse class
-    const parser = new PDFParse({ data: new Uint8Array(buffer) });
-    const result = await parser.getText();
+    let parser: PDFParse;
+    let result: Awaited<ReturnType<PDFParse["getText"]>>;
+
+    try {
+      parser = new PDFParse({ data: new Uint8Array(buffer) });
+      result = await parser.getText();
+    } catch (parseError) {
+      console.error("PDF parse error:", parseError);
+      return NextResponse.json(
+        { success: false, error: "Unable to read PDF. The file may be corrupted or password-protected." },
+        { status: 422 }
+      );
+    }
+
+    // Check for scanned/image PDFs (empty or minimal text)
+    const extractedText = result.text.trim();
+    if (!extractedText || extractedText.length < 10) {
+      return NextResponse.json(
+        { success: false, error: "Scanned PDF not supported. Please upload a text-based PDF." },
+        { status: 422 }
+      );
+    }
 
     return NextResponse.json({
       success: true,
-      text: result.text,
+      text: extractedText,
     });
   } catch (error) {
-    console.error("PDF parse error:", error);
+    console.error("Unexpected error:", error);
     return NextResponse.json(
-      { success: false, error: "Failed to parse PDF" },
+      { success: false, error: "An unexpected error occurred. Please try again." },
       { status: 500 }
     );
   }
