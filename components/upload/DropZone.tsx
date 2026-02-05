@@ -4,7 +4,9 @@ import {
   forwardRef,
   useState,
   useCallback,
+  useRef,
   type DragEvent,
+  type ChangeEvent,
 } from "react";
 import { motion } from "framer-motion";
 import { Upload } from "lucide-react";
@@ -19,6 +21,7 @@ export interface DropZoneProps {
 const DropZone = forwardRef<HTMLDivElement, DropZoneProps>(
   ({ className, onFileSelect, disabled }, ref) => {
     const [isDragOver, setIsDragOver] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleDragOver = useCallback((e: DragEvent<HTMLDivElement>) => {
       e.preventDefault();
@@ -61,9 +64,28 @@ const DropZone = forwardRef<HTMLDivElement, DropZoneProps>(
       [disabled, onFileSelect]
     );
 
+    const handleClick = useCallback(() => {
+      if (!disabled && fileInputRef.current) {
+        fileInputRef.current.click();
+      }
+    }, [disabled]);
+
+    const handleFileInputChange = useCallback(
+      (e: ChangeEvent<HTMLInputElement>) => {
+        const files = e.target.files;
+        if (files && files.length > 0) {
+          onFileSelect?.(files[0]);
+        }
+        // Reset input so the same file can be selected again
+        e.target.value = "";
+      },
+      [onFileSelect]
+    );
+
     return (
       <motion.div
         ref={ref}
+        onClick={handleClick}
         onDragOver={handleDragOver}
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
@@ -84,6 +106,16 @@ const DropZone = forwardRef<HTMLDivElement, DropZoneProps>(
           className
         )}
       >
+        {/* Hidden file input */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".pdf"
+          onChange={handleFileInputChange}
+          className="hidden"
+          disabled={disabled}
+        />
+
         {/* Upload Icon */}
         <motion.div
           animate={{
