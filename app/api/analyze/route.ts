@@ -11,6 +11,32 @@ export interface AnalyzeRequest {
   company?: string;
 }
 
+// Handle unsupported methods
+export async function GET() {
+  return new Response(
+    JSON.stringify({ error: "Method not allowed. Use POST to analyze a resume." }),
+    {
+      status: 405,
+      headers: {
+        "Content-Type": "application/json",
+        Allow: "POST, OPTIONS"
+      }
+    }
+  );
+}
+
+// Handle CORS preflight
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 204,
+    headers: {
+      Allow: "POST, OPTIONS",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+    },
+  });
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = (await request.json()) as AnalyzeRequest;

@@ -7,6 +7,26 @@ export const dynamic = "force-dynamic";
 const MAX_FILE_SIZE_MB = 5;
 const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 
+// Handle unsupported methods
+export async function GET() {
+  return NextResponse.json(
+    { error: "Method not allowed. Use POST to upload a PDF file." },
+    { status: 405, headers: { Allow: "POST, OPTIONS" } }
+  );
+}
+
+// Handle CORS preflight
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      Allow: "POST, OPTIONS",
+      "Access-Control-Allow-Methods": "POST, OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+    },
+  });
+}
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
