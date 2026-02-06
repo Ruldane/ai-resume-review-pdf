@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PDFParse } from "pdf-parse";
 
-export const runtime = "nodejs";
+// Vercel serverless function configuration
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+export const maxDuration = 60; // Maximum execution time in seconds
 
 const MAX_FILE_SIZE_MB = 5;
 const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
