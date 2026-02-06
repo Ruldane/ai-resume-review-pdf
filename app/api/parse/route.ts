@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { extractText } from "unpdf";
+import { extractText, getDocumentProxy } from "unpdf";
 
 // Vercel serverless function configuration
 export const dynamic = "force-dynamic";
@@ -48,15 +48,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Convert File to Buffer
+    // Convert File to ArrayBuffer and then Uint8Array
     const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
+    const uint8Array = new Uint8Array(arrayBuffer);
 
     // Parse PDF using unpdf (serverless-friendly)
     let extractedText: string;
 
     try {
-      const { text } = await extractText(buffer, { mergePages: true });
+      // First, load the PDF into a document proxy
+      const pdf = await getDocumentProxy(uint8Array);
+
+      // Then extract text from all pages
+      const { text } = await extractText(pdf, { mergePages: true });
       extractedText = text.trim();
     } catch (parseError) {
       console.error("PDF parse error:", parseError);
