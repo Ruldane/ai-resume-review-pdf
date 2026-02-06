@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PDFParse } from "pdf-parse";
+import { extractText } from "unpdf";
 
 // Vercel serverless function configuration
 export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
 export const maxDuration = 60; // Maximum execution time in seconds
 
 const MAX_FILE_SIZE_MB = 5;
@@ -53,14 +52,12 @@ export async function POST(request: NextRequest) {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    // Parse PDF using PDFParse class
-    let parser: PDFParse;
-    let result: Awaited<ReturnType<PDFParse["getText"]>>;
+    // Parse PDF using unpdf (serverless-friendly)
+    let extractedText: string;
 
     try {
-      parser = new PDFParse({ data: new Uint8Array(buffer) });
-      result = await parser.getText();
-      await parser.destroy();
+      const { text } = await extractText(buffer, { mergePages: true });
+      extractedText = text.trim();
     } catch (parseError) {
       console.error("PDF parse error:", parseError);
       console.error("Error name:", (parseError as Error).name);
@@ -73,7 +70,6 @@ export async function POST(request: NextRequest) {
     }
 
     // Check for scanned/image PDFs (empty or minimal text)
-    const extractedText = result.text.trim();
     if (!extractedText || extractedText.length < 10) {
       return NextResponse.json(
         { success: false, error: "Scanned PDF not supported. Please upload a text-based PDF." },
