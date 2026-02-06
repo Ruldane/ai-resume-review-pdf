@@ -20,39 +20,38 @@ Your tone should be:
 You MUST respond with valid JSON matching this exact schema:
 
 {
-  "overallScore": <number 0-100>,
-  "verdict": "<string: one of 'needs_work' | 'decent' | 'strong' | 'excellent'>",
-  "roastSummary": "<string: 2-3 sentence witty but constructive summary of the resume>",
+  "overall_score": <number 0-100>,
+  "overall_verdict": "<string: one of 'brutal_honesty_needed' | 'needs_work' | 'solid_foundation' | 'exceptional'>",
+  "roast_summary": "<string: 2-3 sentence witty but constructive summary of the resume>",
   "sections": [
     {
       "name": "<string: section name like 'Summary', 'Experience', 'Skills', etc.>",
       "score": <number 0-100>,
       "severity": "<string: one of 'critical' | 'warning' | 'good'>",
-      "feedback": "<string: specific feedback for this section>",
-      "improvements": ["<string: specific improvement suggestion>", ...]
+      "original": "<string: a key excerpt from the original section>",
+      "improved": "<string: your improved rewrite of that excerpt>",
+      "improvement_notes": "<string: explanation of what you changed and why>"
     }
   ],
-  "atsAnalysis": {
-    "score": <number 0-100>,
-    "missingKeywords": ["<string: keyword missing for target role>", ...],
-    "presentKeywords": ["<string: relevant keyword found>", ...],
-    "suggestions": ["<string: ATS optimization suggestion>", ...]
+  "ats_analysis": {
+    "keywords_found": ["<string: relevant keyword found in resume>", ...],
+    "keywords_missing": ["<string: important keyword missing for target role>", ...],
+    "score": <number 0-100>
   },
-  "quickWins": [
+  "quick_wins": [
     {
-      "title": "<string: short title for quick win>",
-      "description": "<string: what to do and why it helps>",
-      "impact": "<string: one of 'high' | 'medium' | 'low'>"
+      "id": "<string: unique identifier like 'qw1', 'qw2'>",
+      "text": "<string: actionable improvement suggestion>",
+      "priority": "<string: one of 'high' | 'medium' | 'low'>"
     }
-  ],
-  "rewrittenSummary": "<string: if the resume has a summary section, provide a rewritten/improved version>"
+  ]
 }
 
 Scoring Guidelines:
-- 0-40: Critical issues, needs major overhaul
-- 41-60: Significant room for improvement
-- 61-80: Decent foundation with some polish needed
-- 81-100: Strong resume with minor tweaks
+- 0-40: brutal_honesty_needed - Critical issues, needs major overhaul
+- 41-60: needs_work - Significant room for improvement
+- 61-80: solid_foundation - Decent foundation with some polish needed
+- 81-100: exceptional - Strong resume with minor tweaks
 
 Section Severity:
 - "critical": Major issues that could get resume rejected

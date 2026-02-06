@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PDFParse } from "pdf-parse";
 
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
 const MAX_FILE_SIZE_MB = 5;
 const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 
@@ -35,8 +38,12 @@ export async function POST(request: NextRequest) {
     try {
       parser = new PDFParse({ data: new Uint8Array(buffer) });
       result = await parser.getText();
+      await parser.destroy();
     } catch (parseError) {
       console.error("PDF parse error:", parseError);
+      console.error("Error name:", (parseError as Error).name);
+      console.error("Error message:", (parseError as Error).message);
+      console.error("Error stack:", (parseError as Error).stack);
       return NextResponse.json(
         { success: false, error: "Unable to read PDF. The file may be corrupted or password-protected." },
         { status: 422 }

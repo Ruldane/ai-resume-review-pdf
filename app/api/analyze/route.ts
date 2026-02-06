@@ -41,12 +41,25 @@ export async function POST(request: NextRequest) {
     const stream = new ReadableStream({
       async start(controller) {
         const encoder = new TextEncoder();
+        let isClosed = false;
 
-        // Helper to send SSE events
+        // Helper to send SSE events safely
         const sendEvent = (event: string, data: unknown) => {
-          controller.enqueue(
-            encoder.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`)
-          );
+          if (isClosed) return;
+          try {
+            controller.enqueue(
+              encoder.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`)
+            );
+          } catch {
+            isClosed = true;
+          }
+        };
+
+        const closeController = () => {
+          if (!isClosed) {
+            isClosed = true;
+            controller.close();
+          }
         };
 
         try {
@@ -76,22 +89,31 @@ export async function POST(request: NextRequest) {
           const reader = aiResponse.body.getReader();
           const decoder = new TextDecoder();
           let fullContent = "";
+          let buffer = ""; // Buffer for incomplete lines
+          let debugRaw = ""; // For error logging
 
           while (true) {
             const { done, value } = await reader.read();
             if (done) break;
 
             const chunk = decoder.decode(value, { stream: true });
-            const lines = chunk.split("\n");
+            buffer += chunk;
+            debugRaw += chunk;
 
-            for (const line of lines) {
+            // Process complete lines (SSE events end with \n\n)
+            const parts = buffer.split("\n");
+            // Keep the last part in buffer (might be incomplete)
+            buffer = parts.pop() || "";
+
+            for (const line of parts) {
               if (line.startsWith("data: ")) {
                 const data = line.slice(6);
                 if (data === "[DONE]") continue;
 
                 try {
                   const parsed = JSON.parse(data);
-                  // Handle different event types from Anthropic API
+
+                  // Handle Anthropic API streaming format
                   if (parsed.type === "content_block_delta") {
                     const text = parsed.delta?.text || "";
                     fullContent += text;
@@ -99,11 +121,45 @@ export async function POST(request: NextRequest) {
                   } else if (parsed.type === "message_stop") {
                     // Message complete
                   }
+                  // Handle OpenAI-style streaming format (used by many API proxies)
+                  else if (parsed.choices?.[0]?.delta?.content) {
+                    const text = parsed.choices[0].delta.content;
+                    fullContent += text;
+                    sendEvent("chunk", { text });
+                  }
+                  // Handle direct content in non-streaming response
+                  else if (parsed.content?.[0]?.text) {
+                    const text = parsed.content[0].text;
+                    fullContent += text;
+                    sendEvent("chunk", { text });
+                  }
                 } catch {
                   // Ignore parse errors for incomplete chunks
                 }
               }
             }
+          }
+
+          // Process any remaining buffer content
+          if (buffer.startsWith("data: ")) {
+            const data = buffer.slice(6);
+            if (data !== "[DONE]") {
+              try {
+                const parsed = JSON.parse(data);
+                if (parsed.type === "content_block_delta") {
+                  const text = parsed.delta?.text || "";
+                  fullContent += text;
+                  sendEvent("chunk", { text });
+                }
+              } catch {
+                // Ignore
+              }
+            }
+          }
+
+          // Log if content is empty for debugging
+          if (!fullContent) {
+            console.error("AI response empty. Raw response:", debugRaw.slice(0, 500));
           }
 
           // Send the complete analysis
@@ -126,7 +182,7 @@ export async function POST(request: NextRequest) {
               error instanceof Error ? error.message : "Analysis failed",
           });
         } finally {
-          controller.close();
+          closeController();
         }
       },
     });

@@ -37,6 +37,21 @@ yarn-error.log*
 # vercel
 .vercel
 
+# claude
+.claude/
+
+# scripts
+scripts/
+
+# tasks
+tasks/
+
+# playwright mcp
+.playwright-mcp/
+
+# misc generated
+nul
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
